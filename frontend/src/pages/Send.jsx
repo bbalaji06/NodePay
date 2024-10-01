@@ -23,15 +23,28 @@ const Send = () => {
                     setAmount(e.target.value)
                 }} />
                 <button onClick={async () => {
-                    await axios.post('http://localhost:3000/api/v1/account/transfer', {
-                        to: id,
-                        amount: amount
-                    }, {
-                        headers: {
-                           Authorization:'Bearer '+localStorage.getItem('token')
+                    try{
+                        await axios.post('http://localhost:3000/api/v1/account/transfer', {
+                            to: id,
+                            amount: amount
+                        }, {
+                            headers: {
+                               Authorization:'Bearer '+localStorage.getItem('token')
+                            }
+                        }).then(response=>{alert(response.data.msg)})
+                        navigate(`/dashboard?from=${from}`)
+                    }
+
+                    catch(err){
+                        const statusCode=err.response.status
+                        if (statusCode==401){
+                            alert("Insufficient Balance!")
                         }
-                    }).then(response=>{alert(response.data.msg)})
-                    navigate(`/dashboard?from=${from}`)
+                        if (statusCode==411){
+                            alert("invalid user")
+                        }
+                        navigate(`/dashboard?from=${from}`)
+                    }
                 }} className="mt-3 w-full text-white bg-green-400 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 border-none">Initiate Transfer</button>
             </div>
 

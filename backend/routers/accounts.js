@@ -21,15 +21,20 @@ accountsRouter.post('/transfer',authMiddleware,async(req,res)=>{
     const {amount,to}=req.body
     const account=await Accounts.findOne({userId:req.userId})
     if(!account||account.balance<amount){
-        await session.abortTransaction()
-        return res.status(401).json({message:"Insufficient Balance"})
+        try{
+            await session.abortTransaction()
+            return res.status(401).json({msg:"Insufficient Balance"})
+        }
+        catch(err){
+            return res.json({msg:"Insufficient Balance"})
+        }
     }
 
     const toAccount=await Accounts.findOne({userId:to})
 
     if (!toAccount){
         await session.abortTransaction()
-        return res.status(411).json({message:"Invalid User"})
+        return res.status(411).json({msg:"Invalid User"})
     }
 
     await Accounts.updateOne({userId:req.userId},{
