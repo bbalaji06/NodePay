@@ -7,8 +7,15 @@ import axios from 'axios'
 const Users = ({from}) => {
   const [users,setUsers]=useState([])
   const [input,setInput]=useState('')
+  const token=localStorage.getItem('token')
   useEffect(()=>{
-    axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${input}`)
+    axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${input}`,
+      {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      }
+    )
     .then(response=>{setUsers(response.data.user)})
   },[input])
   return (

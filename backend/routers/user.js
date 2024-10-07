@@ -5,6 +5,7 @@ const z = require("zod")
 
 const {JWT_SEC} = require('../config')
 const jwt = require("jsonwebtoken");
+const { getUser } = require("../getUser");
 const userRouter = express.Router()
 
 const signupSchema = z.object({
@@ -118,7 +119,7 @@ userRouter.put('/', authMiddleware, async (req, res) => {
 
 })
 
-userRouter.get("/bulk", async (req, res) => {
+userRouter.get("/bulk",authMiddleware, async (req, res) => {
     const filter = req.query.filter || "";
 
     const users = await Users.find({
@@ -132,9 +133,9 @@ userRouter.get("/bulk", async (req, res) => {
             }
         }]
     })
-
+    const filteredUsers=users.filter((user)=>{return user._id!=req.userId})
     res.json({
-        user: users.map(user => ({
+        user: filteredUsers.map(user => ({
             username: user.username,
             firstname: user.firstname,
             lastname: user.lastname,
